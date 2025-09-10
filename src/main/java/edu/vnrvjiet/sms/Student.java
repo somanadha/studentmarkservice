@@ -4,9 +4,9 @@ import lombok.Data;
 
 @Data
 public class Student {
-    private Integer id;
-    private String name;
-    private Integer maths;
-    private Integer physics;
-    private Integer chemistry;
+    public Integer id;
+    public String name;
+    public Integer maths;
+    public Integer physics;
+    public Integer chemistry;
 }
