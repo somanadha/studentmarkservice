@@ -3,6 +3,8 @@ package edu.vnrvjiet.sms;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class StudentMarkService {
     @Autowired
@@ -10,5 +12,9 @@ public class StudentMarkService {
 
     public Boolean addOneStudent(Student student) {
         return studentMarkServiceRepository.addOneStudent(student);
+    }
+
+    public List<Student> findAllStudents() {
+        return studentMarkServiceRepository.findAllStudents();
     }
 }

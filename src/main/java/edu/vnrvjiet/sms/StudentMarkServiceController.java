@@ -3,10 +3,7 @@ package edu.vnrvjiet.sms;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +13,7 @@ import java.util.List;
 public class StudentMarkServiceController {
     @Autowired
     private  StudentMarkService studentMarkService;
+
     @PostMapping("addOne")
     public ResponseEntity<Integer> addOneStudent(@RequestBody Student student) {
         ResponseEntity<Integer> addOneResponse;
@@ -41,7 +39,7 @@ public class StudentMarkServiceController {
 
     @PostMapping("addMulti")
     public ResponseEntity<List<Integer>> addMultipleStudents(@RequestBody List<Student> students) {
-        ResponseEntity<List<Integer>> addMultiResponse;
+        ResponseEntity<List<Integer>> responseEntity;
         List<Integer> addedStudents = new ArrayList<>();
         HttpStatus httpStatus = HttpStatus.OK;
 
@@ -60,8 +58,30 @@ public class StudentMarkServiceController {
             System.out.println("Exception:"+exception.getMessage());
         }
         finally {
-            addMultiResponse = new ResponseEntity<>(addedStudents, httpStatus);
+            responseEntity = new ResponseEntity<>(addedStudents, httpStatus);
         }
-        return addMultiResponse;
+        return responseEntity;
+    }
+
+    @GetMapping("findAll")
+    public ResponseEntity<List<Student>> findAllStudents() {
+
+        ResponseEntity<List<Student>> responseEntity;
+        List<Student> studentList = null;
+        HttpStatus httpStatus = HttpStatus.OK;
+
+        try {
+            studentList = studentMarkService.findAllStudents();
+            httpStatus = HttpStatus.CREATED;
+        }
+        catch (Exception exception) {
+            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            System.out.println("Exception:"+exception.getMessage());
+        }
+        finally {
+            responseEntity = new ResponseEntity<>(studentList, httpStatus);
+        }
+        return responseEntity;
     }
 }
+

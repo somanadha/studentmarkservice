@@ -2,7 +2,9 @@ package edu.vnrvjiet.sms;
 
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 @Repository
 public class StudentMarkServiceRepository {
@@ -14,5 +16,9 @@ public class StudentMarkServiceRepository {
             studetnAdded = true;
         }
         return  studetnAdded;
+    }
+
+    public List<Student> findAllStudents() {
+        return new ArrayList<>(idAndStudentHashMap.values());
     }
 }
