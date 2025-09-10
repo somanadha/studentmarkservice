@@ -23,7 +23,7 @@ pipeline {
         stage('Run Container') {
             steps {
                 script {
-                    bat "docker run -d --name studentmarkservice ${DOCKER_IMAGE}:${BUILD_NUMBER}"
+                    bat "docker run -d --name studentmarkservice -p 8100:8100 ${DOCKER_IMAGE}:${BUILD_NUMBER}"
                 }
             }
         }
