@@ -8,6 +8,6 @@ public class StudentMarkServiceApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(StudentMarkServiceApplication.class, args);
-        System.out.println("Tomcat running for StudentMarksService ...");
+        System.out.println("Tomcat running for Student Mark Microservice ...");
 	}
 }
