@@ -6,11 +6,10 @@ pipeline {
         // DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
         DOCKER_IMAGE = "studentmarkservice"
     }
-
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'master', url: 'https://github.com/somanadha/BigCompanyOrgStruct.git'
+                git branch: 'main', url: 'https://github.com/somanadha/studentmarkservice.git'
             }
         }
 
