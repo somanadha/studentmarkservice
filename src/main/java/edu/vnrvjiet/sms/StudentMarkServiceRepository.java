@@ -12,29 +12,29 @@ import java.util.Optional;
 public class StudentMarkServiceRepository {
     HashMap<Integer, Student> idAndStudentHashMap = new HashMap<>();
 
-    public Optional<Student> addOneStudent(Student student) {
+    public Student addOneStudent(Student student) {
         if (student != null && !idAndStudentHashMap.containsKey(student.getId())){
             idAndStudentHashMap.put(student.getId(), student);
-            return Optional.of(student);
         }
-        return  Optional.empty();
+        return  student;
     }
 
     public List<Student> findAllStudents() {
         return new ArrayList<>(idAndStudentHashMap.values());
     }
 
-    public Optional<Student> findById(Integer id) {
-        if (idAndStudentHashMap.containsKey(id)){
-            return Optional.of(idAndStudentHashMap.get(id));
+    public Student findById(Integer id) {
+        Student student = null;
+        if (id!= null && idAndStudentHashMap.containsKey(id)){
+            student = idAndStudentHashMap.get(id);
         }
-        return  Optional.empty();
+        return  student;
     }
 
-    public Optional<Student> deleteById(Integer id) {
-        Optional<Student> student = Optional.empty();
-        if (idAndStudentHashMap.containsKey(id)){
-            student = Optional.of(idAndStudentHashMap.get(id));
+    public Student deleteById(Integer id) {
+        Student student = null;
+        if (id!= null && idAndStudentHashMap.containsKey(id)){
+            student = idAndStudentHashMap.get(id);
             idAndStudentHashMap.remove(id);
         }
         return student;

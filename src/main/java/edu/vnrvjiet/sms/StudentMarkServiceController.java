@@ -16,36 +16,23 @@ public class StudentMarkServiceController {
     private  StudentMarkService studentMarkService;
 
     @PostMapping("addOne")
-    public ResponseEntity<List<Student>> addOneStudent(@RequestBody Student student) {
-        List<Student> students = new ArrayList<>();
-        if (student != null){
-            students.add(student);
-        }
-        return addMultipleStudents(students);
-    }
-
-    @PostMapping("addMulti")
-    public ResponseEntity<List<Student>> addMultipleStudents(@RequestBody List<Student> students) {
-        ResponseEntity<List<Student>> responseEntity;
-        List<Student> addedStudents = new ArrayList<>();
+    public ResponseEntity<Student> addOneStudent(@RequestBody Student student) {
+        ResponseEntity<Student> responseEntity;
         HttpStatus httpStatus = HttpStatus.OK;
+        Integer studentId = student.getId();
 
         try {
-            if (students != null) {
-                for (Student student : students) {
-                    if (!studentMarkService.addOneStudent(student).isEmpty()) {
-                        addedStudents.add(student);
-                    }
-                }
+            student = studentMarkService.addOneStudent(student);
+            if (student != null) {
+                httpStatus = HttpStatus.CREATED;
             }
-            httpStatus = HttpStatus.CREATED;
         }
         catch (Exception exception) {
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
             System.out.println("Exception:"+exception.getMessage());
         }
         finally {
-            responseEntity = new ResponseEntity<>(addedStudents, httpStatus);
+            responseEntity = new ResponseEntity<>(student, httpStatus);
         }
         return responseEntity;
     }
@@ -70,11 +57,12 @@ public class StudentMarkServiceController {
         }
         return responseEntity;
     }
+
     @GetMapping("findById")
     public ResponseEntity<Student> findById(Integer id) {
 
         ResponseEntity<Student> responseEntity;
-        Optional<Student> student  = Optional.empty();
+        Student student  = null;
         HttpStatus httpStatus = HttpStatus.OK;
 
         try {
@@ -85,7 +73,7 @@ public class StudentMarkServiceController {
             System.out.println("Exception:"+exception.getMessage());
         }
         finally {
-            responseEntity = new ResponseEntity<>(student.orElse(null), httpStatus);
+            responseEntity = new ResponseEntity<>(student, httpStatus);
         }
         return responseEntity;
     }
@@ -94,7 +82,7 @@ public class StudentMarkServiceController {
     public ResponseEntity<Student> deleteById(Integer id) {
 
         ResponseEntity<Student> responseEntity;
-        Optional<Student> student  = Optional.empty();
+        Student student  = null;
         HttpStatus httpStatus = HttpStatus.OK;
 
         try {
@@ -105,7 +93,7 @@ public class StudentMarkServiceController {
             System.out.println("Exception:"+exception.getMessage());
         }
         finally {
-            responseEntity = new ResponseEntity<>(student.orElse(null), httpStatus);
+            responseEntity = new ResponseEntity<>(student, httpStatus);
         }
         return responseEntity;
     }

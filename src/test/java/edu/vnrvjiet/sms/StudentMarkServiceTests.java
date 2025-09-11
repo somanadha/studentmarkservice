@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -24,7 +25,8 @@ public class StudentMarkServiceTests {
     public void addOneStudentTest() {
         Student student = new Student(1, "Satya", 100, 100, 100);
         studentMarkService.addOneStudent(student);
-        Optional<Student> foundStudent = studentMarkServiceRepository.findById(1);
-        foundStudent.ifPresent(value -> assertEquals("Satya", value.getName()));
+        student = studentMarkServiceRepository.findById(1);
+        assertNotEquals(null, student);
+        assertEquals("Satya", student.getName());
     }
 }
