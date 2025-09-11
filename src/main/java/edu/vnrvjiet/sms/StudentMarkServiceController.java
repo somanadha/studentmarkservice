@@ -80,7 +80,7 @@ public class StudentMarkServiceController {
         return responseEntity;
     }
 
-    @GetMapping("deleteById")
+    @DeleteMapping("deleteById")
     public ResponseEntity<Student> deleteById(Integer id) {
         ResponseEntity<Student> responseEntity;
         Student student  = null;
@@ -101,7 +101,8 @@ public class StudentMarkServiceController {
         }
         return responseEntity;
     }
-    @PostMapping("update")
+
+    @PutMapping("update")
     public ResponseEntity<Student> updateStudent(@RequestBody Student student) {
         ResponseEntity<Student> responseEntity;
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
