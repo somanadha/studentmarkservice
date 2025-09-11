@@ -16,40 +16,26 @@ public class StudentMarkServiceController {
     private  StudentMarkService studentMarkService;
 
     @PostMapping("addOne")
-    public ResponseEntity<Integer> addOneStudent(@RequestBody Student student) {
-        ResponseEntity<Integer> addOneResponse;
-        HttpStatus httpStatus = HttpStatus.OK;
-        Integer studentId = student.getId();
-
-        try {
-            Boolean studentAdded = studentMarkService.addOneStudent(student);
-            if (!studentAdded) {
-                studentId = -1;
-            }
-            httpStatus = HttpStatus.CREATED;
+    public ResponseEntity<List<Student>> addOneStudent(@RequestBody Student student) {
+        List<Student> students = new ArrayList<>();
+        if (student != null){
+            students.add(student);
         }
-        catch (Exception exception) {
-            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            System.out.println("Exception:"+exception.getMessage());
-        }
-        finally {
-            addOneResponse = new ResponseEntity<>(studentId, httpStatus);
-        }
-        return addOneResponse;
+        return addMultipleStudents(students);
     }
 
     @PostMapping("addMulti")
-    public ResponseEntity<List<Integer>> addMultipleStudents(@RequestBody List<Student> students) {
-        ResponseEntity<List<Integer>> responseEntity;
-        List<Integer> addedStudents = new ArrayList<>();
+    public ResponseEntity<List<Student>> addMultipleStudents(@RequestBody List<Student> students) {
+        ResponseEntity<List<Student>> responseEntity;
+        List<Student> addedStudents = new ArrayList<>();
         HttpStatus httpStatus = HttpStatus.OK;
 
         try {
-            Boolean studentAdded = true;
-            for(Student student : students) {
-                studentAdded = studentAdded && studentMarkService.addOneStudent(student);
-                if (studentAdded) {
-                    addedStudents.add(student.getId());
+            if (students != null) {
+                for (Student student : students) {
+                    if (!studentMarkService.addOneStudent(student).isEmpty()) {
+                        addedStudents.add(student);
+                    }
                 }
             }
             httpStatus = HttpStatus.CREATED;
@@ -103,6 +89,25 @@ public class StudentMarkServiceController {
         }
         return responseEntity;
     }
-    
+
+    @GetMapping("deleteById")
+    public ResponseEntity<Student> deleteById(Integer id) {
+
+        ResponseEntity<Student> responseEntity;
+        Optional<Student> student  = Optional.empty();
+        HttpStatus httpStatus = HttpStatus.OK;
+
+        try {
+            student = studentMarkService.deleteById(id);
+        }
+        catch (Exception exception) {
+            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            System.out.println("Exception:"+exception.getMessage());
+        }
+        finally {
+            responseEntity = new ResponseEntity<>(student.orElse(null), httpStatus);
+        }
+        return responseEntity;
+    }
 }
 

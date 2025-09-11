@@ -11,7 +11,7 @@ public class StudentMarkService {
     @Autowired
     StudentMarkServiceRepository studentMarkServiceRepository;
 
-    public Boolean addOneStudent(Student student) {
+    public Optional<Student> addOneStudent(Student student) {
         return studentMarkServiceRepository.addOneStudent(student);
     }
 
@@ -21,5 +21,9 @@ public class StudentMarkService {
 
     public Optional<Student> findById(Integer id) {
         return studentMarkServiceRepository.findById(id);
+    }
+
+    public Optional<Student> deleteById(Integer id) {
+        return studentMarkServiceRepository.deleteById(id);
     }
 }
