@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class StudentMarkServiceRepository {
@@ -20,5 +21,12 @@ public class StudentMarkServiceRepository {
 
     public List<Student> findAllStudents() {
         return new ArrayList<>(idAndStudentHashMap.values());
+    }
+
+    public Optional<Student> findById(Integer id) {
+        if (idAndStudentHashMap.containsKey(id)){
+            return Optional.of(idAndStudentHashMap.get(id));
+        }
+        return  Optional.empty();
     }
 }

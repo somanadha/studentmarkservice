@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RequestMapping("sms")
 @RestController
@@ -80,6 +81,25 @@ public class StudentMarkServiceController {
         }
         finally {
             responseEntity = new ResponseEntity<>(studentList, httpStatus);
+        }
+        return responseEntity;
+    }
+    @GetMapping("findById")
+    public ResponseEntity<Student> findById(Integer id) {
+
+        ResponseEntity<Student> responseEntity;
+        Optional<Student> student  = Optional.empty();
+        HttpStatus httpStatus = HttpStatus.OK;
+
+        try {
+            student = studentMarkService.findById(id);
+        }
+        catch (Exception exception) {
+            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            System.out.println("Exception:"+exception.getMessage());
+        }
+        finally {
+            responseEntity = new ResponseEntity<>(student.orElse(null), httpStatus);
         }
         return responseEntity;
     }

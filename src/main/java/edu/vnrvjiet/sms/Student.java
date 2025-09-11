@@ -1,12 +1,14 @@
 package edu.vnrvjiet.sms;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class Student {
-    public Integer id;
-    public String name;
-    public Integer maths;
-    public Integer physics;
-    public Integer chemistry;
+    private Integer id;
+    private String name;
+    private Integer maths;
+    private Integer physics;
+    private Integer chemistry;
 }

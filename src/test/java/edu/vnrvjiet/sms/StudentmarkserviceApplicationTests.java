@@ -9,5 +9,4 @@ class StudentmarkserviceApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
 }
