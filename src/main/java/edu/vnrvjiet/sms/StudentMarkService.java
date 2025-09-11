@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class StudentMarkService {
@@ -12,11 +11,11 @@ public class StudentMarkService {
     StudentMarkServiceRepository studentMarkServiceRepository;
 
     public Student addOneStudent(Student student) {
-        return studentMarkServiceRepository.addOneStudent(student);
+        return studentMarkServiceRepository.add(student);
     }
 
     public List<Student> findAllStudents() {
-        return studentMarkServiceRepository.findAllStudents();
+        return studentMarkServiceRepository.findAll();
     }
 
     public Student findById(Integer id) {
@@ -25,5 +24,9 @@ public class StudentMarkService {
 
     public Student deleteById(Integer id) {
         return studentMarkServiceRepository.deleteById(id);
+    }
+
+    public Student updateStudent(Student student) {
+        return studentMarkServiceRepository.update(student);
     }
 }

@@ -5,9 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @RequestMapping("sms")
 @RestController
@@ -18,7 +16,7 @@ public class StudentMarkServiceController {
     @PostMapping("addOne")
     public ResponseEntity<Student> addOneStudent(@RequestBody Student student) {
         ResponseEntity<Student> responseEntity;
-        HttpStatus httpStatus = HttpStatus.OK;
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
         Integer studentId = student.getId();
 
         try {
@@ -46,7 +44,9 @@ public class StudentMarkServiceController {
 
         try {
             studentList = studentMarkService.findAllStudents();
-            httpStatus = HttpStatus.CREATED;
+            if (studentList.isEmpty()) {
+                httpStatus = HttpStatus.NO_CONTENT;
+            }
         }
         catch (Exception exception) {
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -60,13 +60,15 @@ public class StudentMarkServiceController {
 
     @GetMapping("findById")
     public ResponseEntity<Student> findById(Integer id) {
-
         ResponseEntity<Student> responseEntity;
         Student student  = null;
         HttpStatus httpStatus = HttpStatus.OK;
 
         try {
             student = studentMarkService.findById(id);
+            if (student == null) {
+                httpStatus = HttpStatus.NO_CONTENT;
+            }
         }
         catch (Exception exception) {
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -80,13 +82,36 @@ public class StudentMarkServiceController {
 
     @GetMapping("deleteById")
     public ResponseEntity<Student> deleteById(Integer id) {
-
         ResponseEntity<Student> responseEntity;
         Student student  = null;
         HttpStatus httpStatus = HttpStatus.OK;
 
         try {
             student = studentMarkService.deleteById(id);
+            if (student == null){
+                httpStatus = HttpStatus.NO_CONTENT;
+            }
+        }
+        catch (Exception exception) {
+            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+            System.out.println("Exception:"+exception.getMessage());
+        }
+        finally {
+            responseEntity = new ResponseEntity<>(student, httpStatus);
+        }
+        return responseEntity;
+    }
+    @PostMapping("update")
+    public ResponseEntity<Student> updateStudent(@RequestBody Student student) {
+        ResponseEntity<Student> responseEntity;
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+        Integer studentId = student.getId();
+
+        try {
+            student = studentMarkService.updateStudent(student);
+            if (student != null) {
+                httpStatus = HttpStatus.OK;
+            }
         }
         catch (Exception exception) {
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -98,4 +123,3 @@ public class StudentMarkServiceController {
         return responseEntity;
     }
 }
-
