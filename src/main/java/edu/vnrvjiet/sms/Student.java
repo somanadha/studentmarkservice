@@ -3,6 +3,7 @@ package edu.vnrvjiet.sms;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+// this is the Domain object
 @Data
 @AllArgsConstructor
 public class Student {
