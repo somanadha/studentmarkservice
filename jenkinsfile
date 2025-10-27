@@ -4,7 +4,10 @@ pipeline {
     environment {
         // Uncomment below if pushing to DockerHub
         // DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
-        DOCKER_IMAGE = "studentmarkservice_image"
+        APP_NAME = "studentmarkservice"
+        IMAGE_NAME = "${APP_NAME}_image"
+        IMAGE_TAG = "${BUILD_NUMBER}${BUILD_NUMBER}"
+        APP_K8S_NAMESPACE = "${APP_NAME}_ns"
     }
     stages {
         stage('Checkout') {
@@ -16,14 +19,26 @@ pipeline {
         stage('Build') {
             steps {
                 // Build docker image using Dockerfile
-                bat "docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} -f Dockerfile ."
+                bat "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -f Dockerfile ."
             }
         }
 
         stage('Run Container') {
             steps {
                 script {
-                    bat "docker run -d --name studentmarkservice -p 8100:8100 ${DOCKER_IMAGE}:${BUILD_NUMBER}"
+                    bat "docker run -d --name ${APP_NAME} -p 8100:8100 ${IMAGE_NAME}:${IMAGE_TAG}"
+                }
+            }
+        }
+
+        stage('K8s Deployment') {
+            steps {
+                script {
+                    // Replace variable in YAML and apply
+                    envsubst < k8s/deployment-template.yaml > k8s/deployment.yaml
+                    kubectl apply -f k8s/deployment.yaml
+                    kubectl apply -f k8s/service.yaml
+                    kubectl apply -f k8s/namespace.yaml
                 }
             }
         }
