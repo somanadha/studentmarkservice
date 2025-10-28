@@ -36,7 +36,13 @@ pipeline {
             steps {
                 script {
                     // Replace variable in YAML and apply
-                    bat "bash -c 'envsubst < k8s/deployment-template.yaml > k8s/deployment.yaml'"
+                    //bat "bash -c 'envsubst < k8s/deployment-template.yaml > k8s/deployment.yaml'"
+                    powershell '''
+                    (Get-Content "k8s/deployment-template.yaml") -replace "\\$\\{(.*?)\\}", {
+                        param($match)
+                        $env:$($match.Groups[1].Value)
+                    } | Set-Content "k8s/deployment.yaml"
+                    '''
                     bat "kubectl apply -f k8s/deployment.yaml"
                     bat "kubectl apply -f k8s/service.yaml"
                     bat "kubectl apply -f k8s/namespace.yaml"
