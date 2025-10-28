@@ -37,6 +37,7 @@ pipeline {
                 script {
                     // Replace variable in YAML and apply
                     bat "bash -c \"envsubst < k8s/deployment-template.yaml > k8s/deployment.yaml\""
+
 //                     bat '''
 //                     bash -lc "envsubst < k8s/deployment-template.yaml > k8s/deployment.yaml"
 //                     '''
