@@ -26,6 +26,7 @@ pipeline {
         stage('Run Container') {
             steps {
                 script {
+                    // Run docker container instance
                     bat "docker run -d --name ${APP_NAME} -p 8100:8100 ${IMAGE_NAME}:${IMAGE_TAG}"
                 }
             }
