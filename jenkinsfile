@@ -35,10 +35,10 @@ pipeline {
             steps {
                 script {
                     // Replace variable in YAML and apply
-                    envsubst < k8s/deployment-template.yaml > k8s/deployment.yaml
-                    kubectl apply -f k8s/deployment.yaml
-                    kubectl apply -f k8s/service.yaml
-                    kubectl apply -f k8s/namespace.yaml
+                    bat "envsubst < k8s/deployment-template.yaml > k8s/deployment.yaml"
+                    bat "kubectl apply -f k8s/deployment.yaml"
+                    bat "kubectl apply -f k8s/service.yaml"
+                    bat "kubectl apply -f k8s/namespace.yaml"
                 }
             }
         }
