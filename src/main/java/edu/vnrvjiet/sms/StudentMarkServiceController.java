@@ -7,120 +7,39 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequestMapping("sms")
 @RestController
+@RequestMapping("sms")
 public class StudentMarkServiceController {
     @Autowired
     private  StudentMarkService studentMarkService;
 
     @PostMapping("addOne")
     public ResponseEntity<Student> addOneStudent(@RequestBody Student student) {
-        ResponseEntity<Student> responseEntity;
-        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
-        Integer studentId = student.getId();
-
-        try {
-            student = studentMarkService.addOneStudent(student);
-            if (student != null) {
-                httpStatus = HttpStatus.CREATED;
-            }
-        }
-        catch (Exception exception) {
-            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            System.out.println("Exception:"+exception.getMessage());
-        }
-        finally {
-            responseEntity = new ResponseEntity<>(student, httpStatus);
-        }
-        return responseEntity;
+        student = studentMarkService.addOneStudent(student);
+        return new ResponseEntity<>(student, HttpStatus.CREATED);
     }
 
     @GetMapping("findAll")
     public ResponseEntity<List<Student>> findAllStudents() {
-
-        ResponseEntity<List<Student>> responseEntity;
-        List<Student> studentList = null;
-        HttpStatus httpStatus = HttpStatus.OK;
-
-        try {
-            studentList = studentMarkService.findAllStudents();
-            if (studentList.isEmpty()) {
-                httpStatus = HttpStatus.NO_CONTENT;
-            }
-        }
-        catch (Exception exception) {
-            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            System.out.println("Exception:"+exception.getMessage());
-        }
-        finally {
-            responseEntity = new ResponseEntity<>(studentList, httpStatus);
-        }
-        return responseEntity;
+        List<Student> studentList = studentMarkService.findAllStudents();
+        return new ResponseEntity<>(studentList, HttpStatus.OK);
     }
 
     @GetMapping("findById")
     public ResponseEntity<Student> findById(Integer id) {
-        ResponseEntity<Student> responseEntity;
-        Student student  = null;
-        HttpStatus httpStatus = HttpStatus.OK;
-
-        try {
-            student = studentMarkService.findById(id);
-            if (student == null) {
-                httpStatus = HttpStatus.NO_CONTENT;
-            }
-        }
-        catch (Exception exception) {
-            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            System.out.println("Exception:"+exception.getMessage());
-        }
-        finally {
-            responseEntity = new ResponseEntity<>(student, httpStatus);
-        }
-        return responseEntity;
+        Student student = student = studentMarkService.findById(id);
+        return new ResponseEntity<>(student, HttpStatus.OK);
     }
 
     @DeleteMapping("deleteById")
     public ResponseEntity<Student> deleteById(Integer id) {
-        ResponseEntity<Student> responseEntity;
-        Student student  = null;
-        HttpStatus httpStatus = HttpStatus.OK;
-
-        try {
-            student = studentMarkService.deleteById(id);
-            if (student == null){
-                httpStatus = HttpStatus.NO_CONTENT;
-            }
-        }
-        catch (Exception exception) {
-            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            System.out.println("Exception:"+exception.getMessage());
-        }
-        finally {
-            responseEntity = new ResponseEntity<>(student, httpStatus);
-        }
-        return responseEntity;
+        Student student = studentMarkService.deleteById(id);
+        return new ResponseEntity<>(student, HttpStatus.OK);
     }
 
     @PutMapping("update")
     public ResponseEntity<Student> updateStudent(@RequestBody Student student) {
-        ResponseEntity<Student> responseEntity;
-        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
-        Integer studentId = student.getId();
-
-        try {
-            student = studentMarkService.updateStudent(student);
-            if (student != null) {
-                httpStatus = HttpStatus.OK;
-            }
-        }
-        catch (Exception exception) {
-            httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-            System.out.println("Exception:"+exception.getMessage());
-        }
-        finally {
-            responseEntity = new ResponseEntity<>(student, httpStatus);
-        }
-        return responseEntity;
+        student = studentMarkService.updateStudent(student);
+        return new ResponseEntity<>(student, HttpStatus.OK);
     }
 }

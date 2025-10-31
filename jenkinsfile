@@ -1,13 +1,12 @@
 pipeline {
     agent any
-
     environment {
-        // Uncomment below if pushing to DockerHub
-        // DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
         APP_NAME = "studentmarkservice"
         IMAGE_NAME = "${APP_NAME}_image"
         IMAGE_TAG = "${BUILD_NUMBER}${BUILD_NUMBER}"
         APP_K8S_NAMESPACE = "${APP_NAME}_ns"
+        PORT = 8100
+        NODE_PORT = 30081
     }
     stages {
         stage('Checkout') {
@@ -15,14 +14,12 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/somanadha/studentmarkservice.git'
             }
         }
-
         stage('Build') {
             steps {
                 // Build docker image using Dockerfile
                 bat "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -f Dockerfile ."
             }
         }
-
         stage('Run Container') {
             steps {
                 script {
@@ -31,12 +28,13 @@ pipeline {
                 }
             }
         }
-
         stage('K8s Deployment') {
             steps {
                 script {
                     // Replace variable in YAML and apply
                     bat "envsubst < k8s/deployment-template.yaml > k8s/deployment.yaml"
+                    bat "envsubst < k8s/service-template.yaml > k8s/service.yaml"
+
                     bat "kubectl apply -f k8s/deployment.yaml"
                     bat "kubectl apply -f k8s/service.yaml"
                     bat "kubectl apply -f k8s/namespace.yaml"
@@ -44,7 +42,6 @@ pipeline {
             }
         }
     }
-
     post {
         success {
             echo "✅ Checkout, Build, Dockerize & Deploy completed successfully!"
