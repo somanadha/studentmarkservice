@@ -1,4 +1,4 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: ${APP_NAME}-ns
+  name: ${APP_NAMESPACE}
