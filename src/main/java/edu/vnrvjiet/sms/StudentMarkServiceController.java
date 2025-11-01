@@ -27,7 +27,7 @@ public class StudentMarkServiceController {
 
     @GetMapping("findById")
     public ResponseEntity<Student> findById(Integer id) {
-        Student student = student = studentMarkService.findById(id);
+        Student student = studentMarkService.findById(id);
         return new ResponseEntity<>(student, HttpStatus.OK);
     }
 
