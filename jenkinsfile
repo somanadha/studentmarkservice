@@ -20,6 +20,7 @@ pipeline {
                 bat "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -f Dockerfile ."
             }
         }
+        /*
         stage('Run Container') {
             steps {
                 script {
@@ -27,11 +28,11 @@ pipeline {
                     bat "docker run -d --name ${APP_NAME} -p 8100:8100 ${IMAGE_NAME}:${IMAGE_TAG}"
                 }
             }
-        }
+        }*/
         stage('K8s Deployment') {
             steps {
                 script {
-                    withEnv(["KUBECONFIG=${env.USERPROFILE}\\.kube\\config"]) {
+                    withEnv(["KUBECONFIG=c:\\users\test\\.kube\\config"]) {
                         // Replace variables in YAML
                         bat "envsubst < k8s/deployment-template.yaml > k8s/deployment.yaml"
                         bat "envsubst < k8s/service-template.yaml > k8s/service.yaml"
