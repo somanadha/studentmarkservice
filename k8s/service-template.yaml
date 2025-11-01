@@ -7,6 +7,6 @@ spec:
   selector:
     app: ${APP_NAME}
   ports:
-    - port: ${PORT}          # Service port (inside cluster)
-      targetPort: ${PORT}    # Container port
+    - port: ${APP_PORT}          # Service port (inside cluster)
+      targetPort: ${APP_PORT}    # Container port
       nodePort: ${NODE_PORT}     # Port accessible from Postman (your host)

@@ -5,7 +5,7 @@ pipeline {
         IMAGE_NAME = "${APP_NAME}_image"
         IMAGE_TAG = "${BUILD_NUMBER}${BUILD_NUMBER}"
         APP_K8S_NAMESPACE = "${APP_NAME}_ns"
-        PORT = 8100
+        APP_PORT = 8100
         NODE_PORT = 30081
     }
     stages {
@@ -34,6 +34,7 @@ pipeline {
                     // Replace variable in YAML and apply
                     bat "envsubst < k8s/deployment-template.yaml > k8s/deployment.yaml"
                     bat "envsubst < k8s/service-template.yaml > k8s/service.yaml"
+                    bat "envsubst < k8s/namespace-template.yaml > k8s/namespace.yaml"
 
                     bat "kubectl apply -f k8s/deployment.yaml --validate=false"
                     bat "kubectl apply -f k8s/service.yaml --validate=false"

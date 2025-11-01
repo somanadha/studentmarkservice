@@ -17,4 +17,4 @@ spec:
           image: ${IMAGE_NAME}:${IMAGE_TAG}
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 8100
+            - containerPort: ${APP_PORT}
