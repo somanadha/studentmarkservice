@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         APP_NAME = "studentmarkservice"
-        APP_NAMESPACE = ${APP_NAME}-ns
+        APP_NAMESPACE = "${APP_NAME}-ns"
         IMAGE_NAME = "${APP_NAME}-image"
         IMAGE_TAG = "${BUILD_NUMBER}${BUILD_NUMBER}"
         APP_PORT = 8100
