@@ -7,6 +7,7 @@ pipeline {
         IMAGE_TAG = "${BUILD_NUMBER}${BUILD_NUMBER}"
         APP_PORT = 8100
         NODE_PORT = 30081
+        REPLICA_COUNT = 2
     }
     stages {
         stage('Checkout') {
@@ -20,6 +21,16 @@ pipeline {
                 bat "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -f Dockerfile ."
             }
         }
+        /*
+        stage('Run Container') {
+            steps {
+                script {
+                    // Run docker container instance
+                    bat "docker run -d --name ${APP_NAME} -p 8100:8100 ${IMAGE_NAME}:${IMAGE_TAG}"
+                }
+            }
+        }
+        */
         stage('K8s Container Deployment') {
             steps {
                 script {

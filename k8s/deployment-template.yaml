@@ -4,7 +4,7 @@ metadata:
   name: ${APP_NAME}-deployment
   namespace: ${APP_NAMESPACE}
 spec:
-  replicas: 2
+  replicas: ${REPLICA_COUNT}
   selector:
     matchLabels:
       app: ${APP_NAME}
