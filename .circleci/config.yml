@@ -1,31 +1,63 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine.
-# See: https://circleci.com/docs/reference/configuration-reference
 version: 2.1
 
-# Define a job to be invoked later in a workflow.
-# See: https://circleci.com/docs/guides/orchestrate/jobs-steps/#jobs-overview & https://circleci.com/docs/reference/configuration-reference/#jobs
 jobs:
-  say-hello:
-    # Specify the execution environment. You can specify an image from Docker Hub or use one of our convenience images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/guides/execution-managed/executor-intro/ & https://circleci.com/docs/reference/configuration-reference/#executor-job
+  build-and-deploy:
     docker:
-      # Specify the version you desire here
-      # See: https://circleci.com/developer/images/image/cimg/base
-      - image: cimg/base:current
-
-    # Add steps to the job
-    # See: https://circleci.com/docs/guides/orchestrate/jobs-steps/#steps-overview & https://circleci.com/docs/reference/configuration-reference/#steps
+      - image: cimg/base:stable
+    environment:
+      APP_NAME: "studentmarkservice"
+      APP_NAMESPACE: "studentmarkservice-ns"
+      IMAGE_NAME: "studentmarkservice-image"
+      APP_PORT: "8100"
+      NODE_PORT: "30081"
+      REPLICA_COUNT: "2"
     steps:
-      # Checkout the code as the first step.
       - checkout
-      - run:
-          name: "Say hello"
-          command: "echo Hello, World!"
 
-# Orchestrate jobs using workflows
-# See: https://circleci.com/docs/guides/orchestrate/workflows/ & https://circleci.com/docs/reference/configuration-reference/#workflows
+      - run:
+          name: Set IMAGE_TAG
+          command: |
+            echo "export IMAGE_TAG=${CIRCLE_BUILD_NUM}${CIRCLE_BUILD_NUM}" >> $BASH_ENV
+            source $BASH_ENV
+            echo "Using image tag: ${IMAGE_TAG}"
+
+      - setup_remote_docker:
+          docker_layer_caching: true
+
+      - run:
+          name: Build Docker image
+          command: |
+            docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -f Dockerfile .
+
+      - run:
+          name: Save Docker image as artifact (optional)
+          command: |
+            mkdir -p workspace
+            docker save -o workspace/${IMAGE_NAME}_${IMAGE_TAG}.tar ${IMAGE_NAME}:${IMAGE_TAG}
+
+      - run:
+          name: Deploy to Kubernetes
+          command: |
+            sudo apt-get update && sudo apt-get install -y gettext-base kubectl
+
+            echo "Kubernetes deployment starting..."
+
+            export KUBECONFIG=$HOME/.kube/config
+
+            envsubst < k8s/namespace-template.yaml > k8s/namespace.yaml
+            envsubst < k8s/deployment-template.yaml > k8s/deployment.yaml
+            envsubst < k8s/service-template.yaml > k8s/service.yaml
+
+            kubectl apply -f k8s/namespace.yaml --validate=false
+            kubectl apply -f k8s/deployment.yaml --validate=false
+            kubectl apply -f k8s/service.yaml --validate=false
+
+      - run:
+          name: Success Message
+          command: echo "✅ Checkout, Build, Dockerize & Deploy completed successfully!"
+
 workflows:
-  say-hello-workflow: # This is the name of the workflow, feel free to change it to better match your workflow.
-    # Inside the workflow, you define the jobs you want to run.
+  version: 2
+  build_and_deploy_workflow:
     jobs:
-      - say-hello
+      - build-and-deploy
