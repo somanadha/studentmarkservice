@@ -15,13 +15,8 @@ RUN mvn -X package -DskipTests
 FROM eclipse-temurin:21-alpine
 WORKDIR /app
 
-# Copy the application JAR from the build stage
+# Copy the application JAR (LEAN/THIN) & its dependencies from the build stage to make a FAT/UBER JAR
 COPY --from=build /app/target/*.jar studentmarkservice.jar
-
-# This is the key part to get all the dependency jars
-# The 'go-offline' goal from the first stage already downloaded them.
-# The 'dependency:copy-dependencies' goal copies all the jars to a specific directory.
-COPY --from=build /app/target/dependency /app/dependency
 
 # Application is running in port 8100
 EXPOSE 8100
