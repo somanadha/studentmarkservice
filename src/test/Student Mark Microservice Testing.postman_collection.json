@@ -1,0 +1,295 @@
+{
+	"info": {
+		"_postman_id": "b7938cc4-82dd-4a07-972f-7674624a1d83",
+		"name": "Student Mark Microservice Testing",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48325017",
+		"_collection_link": "https://somanadha-2519304.postman.co/workspace/Somanadha-Satyadev-Bulusu's-Wor~b075977a-4d46-4002-8be5-b18e9b4c7660/collection/48325017-b7938cc4-82dd-4a07-972f-7674624a1d83?action=share&source=collection_link&creator=48325017"
+	},
+	"item": [
+		{
+			"name": "http://localhost:8100/sms/addOne",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"id\": 1,\r\n  \"name\": \"B.S.Satyadev\",\r\n  \"maths\": 100,\r\n  \"physics\":100,\r\n  \"chemistry\":100\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8100/sms/addOne",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8100",
+					"path": [
+						"sms",
+						"addOne"
+					]
+				},
+				"description": "Add One Student"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8100/sms/findAll",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8100/sms/findAll",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8100",
+					"path": [
+						"sms",
+						"findAll"
+					]
+				},
+				"description": "Find All Students"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8100/sms/findById?id=1",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8100/sms/findById?id=1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8100",
+					"path": [
+						"sms",
+						"findById"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "1"
+						}
+					]
+				},
+				"description": "Find Student By Id"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8100/sms/deleteById?id=3",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"id\": 1,\r\n  \"name\": \"B.S.Satyadev\",\r\n  \"maths\": 100,\r\n  \"physics\":100,\r\n  \"chemistry\":100\r\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8100/sms/deleteById?id=3",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8100",
+					"path": [
+						"sms",
+						"deleteById"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "3"
+						}
+					]
+				},
+				"description": "Delete By Id"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8100/sms/update",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"id\": 3,\r\n  \"name\": \"Mr. y\",\r\n  \"maths\": 100,\r\n  \"physics\":100,\r\n  \"chemistry\":100\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8100/sms/update",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8100",
+					"path": [
+						"sms",
+						"update"
+					]
+				},
+				"description": "Update Student"
+			},
+			"response": []
+		},
+		{
+			"name": "K8s : http://localhost:30081/sms/addOne",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"id\": 1,\r\n  \"name\": \"B.S.Satyadev\",\r\n  \"maths\": 100,\r\n  \"physics\":100,\r\n  \"chemistry\":100\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:30081/sms/addOne",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "30081",
+					"path": [
+						"sms",
+						"addOne"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "K8s : http://localhost:30081/sms/findAll",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:30081/sms/findAll",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "30081",
+					"path": [
+						"sms",
+						"findAll"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "K8s : http://localhost:30081/sms/findById?id=1",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:30081/sms/findById?id=1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "30081",
+					"path": [
+						"sms",
+						"findById"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "K8s : http://localhost:30081/sms/deleteById?id=1",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:30081/sms/deleteById?id=4",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "30081",
+					"path": [
+						"sms",
+						"deleteById"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "4"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "K8s : http://localhost:30081/sms/update",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"id\": 1,\r\n  \"name\": \"B.S.Satyadev\",\r\n  \"maths\": 50,\r\n  \"physics\":50,\r\n  \"chemistry\":50\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:30081/sms/update",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "30081",
+					"path": [
+						"sms",
+						"update"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
