@@ -13,6 +13,12 @@ jobs:
       REPLICA_COUNT: "2"
     steps:
       - checkout
+      - run:
+          name: Install kubectl
+          command: |
+            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+            chmod +x kubectl
+            mv kubectl /usr/local/bin/
 
       - run:
           name: Set IMAGE_TAG
@@ -34,6 +40,12 @@ jobs:
           command: |
             mkdir -p workspace
             docker save -o workspace/${IMAGE_NAME}_${IMAGE_TAG}.tar ${IMAGE_NAME}:${IMAGE_TAG}
+
+      - run:
+          name: Authenticate with cluster
+          command: |
+            echo "$KUBECONFIG_CONTENT" > kubeconfig.yaml
+            export KUBECONFIG=$(pwd)/kubeconfig.yaml
 
       - run:
           name: Deploy to Kubernetes
