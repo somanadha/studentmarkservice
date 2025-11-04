@@ -1,75 +1,111 @@
-version: 2.1
+name: CI/CD Pipeline - StudentMarkService
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  APP_NAME: studentmarkservice
+  APP_NAMESPACE: studentmarkservice-ns
+  IMAGE_NAME: studentmarkservice-image
+  APP_PORT: 8100
+  NODE_PORT: 30081
+  REPLICA_COUNT: 2
+  REGISTRY: docker.io/your-dockerhub-username   # 🔹 Update this
+  K8S_CONFIG_PATH: ${{ github.workspace }}/.kube/config
 
 jobs:
   build-and-deploy:
-    docker:
-      - image: cimg/base:stable
-    environment:
-      APP_NAME: "studentmarkservice"
-      APP_NAMESPACE: "studentmarkservice-ns"
-      IMAGE_NAME: "studentmarkservice-image"
-      APP_PORT: "8100"
-      NODE_PORT: "30081"
-      REPLICA_COUNT: "2"
+    runs-on: ubuntu-latest
+
     steps:
-      - checkout
-      - run:
-          name: Install kubectl
-          command: |
-            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-            chmod +x kubectl
-            mv kubectl /usr/local/bin/
+      # ----------------------------------------------------
+      # 1️⃣ Checkout the Source Code
+      # ----------------------------------------------------
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-      - run:
-          name: Set IMAGE_TAG
-          command: |
-            echo "export IMAGE_TAG=${CIRCLE_BUILD_NUM}${CIRCLE_BUILD_NUM}" >> $BASH_ENV
-            source $BASH_ENV
-            echo "Using image tag: ${IMAGE_TAG}"
+      # ----------------------------------------------------
+      # 2️⃣ Set up Java & Maven
+      # ----------------------------------------------------
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
 
-      - setup_remote_docker:
-          docker_layer_caching: true
+      - name: Build with Maven
+        run: mvn clean package -DskipTests
 
-      - run:
-          name: Build Docker image
-          command: |
-            docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -f Dockerfile .
+      # ----------------------------------------------------
+      # 3️⃣ Set up Docker
+      # ----------------------------------------------------
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - run:
-          name: Save Docker image as artifact (optional)
-          command: |
-            mkdir -p workspace
-            docker save -o workspace/${IMAGE_NAME}_${IMAGE_TAG}.tar ${IMAGE_NAME}:${IMAGE_TAG}
+      - name: Log in to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - run:
-          name: Authenticate with cluster
-          command: |
-            echo "$KUBECONFIG_CONTENT" > kubeconfig.yaml
-            export KUBECONFIG=$(pwd)/kubeconfig.yaml
+      # ----------------------------------------------------
+      # 4️⃣ Build and Push Docker Image
+      # ----------------------------------------------------
+      - name: Build and Push Docker Image
+        run: |
+          IMAGE_TAG=${{ github.run_number }}${{ github.run_number }}
+          docker build -t $REGISTRY/$IMAGE_NAME:$IMAGE_TAG -f Dockerfile .
+          docker push $REGISTRY/$IMAGE_NAME:$IMAGE_TAG
+        env:
+          REGISTRY: ${{ env.REGISTRY }}
+          IMAGE_NAME: ${{ env.IMAGE_NAME }}
 
-      - run:
-          name: Deploy to Kubernetes
-          command: |
-            sudo apt-get update && sudo apt-get install -y gettext-base kubectl
+      # ----------------------------------------------------
+      # 5️⃣ Setup Kubectl
+      # ----------------------------------------------------
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: 'latest'
 
-            echo "Kubernetes deployment starting..."
+      # ----------------------------------------------------
+      # 6️⃣ Configure Kubeconfig (from GitHub Secret)
+      # ----------------------------------------------------
+      - name: Set up Kubeconfig
+        run: |
+          mkdir -p ${{ github.workspace }}/.kube
+          echo "${{ secrets.KUBECONFIG_DATA }}" > $K8S_CONFIG_PATH
+        env:
+          K8S_CONFIG_PATH: ${{ env.K8S_CONFIG_PATH }}
 
-            export KUBECONFIG=$HOME/.kube/config
+      # ----------------------------------------------------
+      # 7️⃣ Replace Variables in YAML (envsubst)
+      # ----------------------------------------------------
+      - name: Substitute Variables in Manifests
+        run: |
+          sudo apt-get update && sudo apt-get install -y gettext-base
+          export IMAGE_TAG=${{ github.run_number }}${{ github.run_number }}
+          export IMAGE_NAME=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          export APP_NAMESPACE=${{ env.APP_NAMESPACE }}
+          export APP_NAME=${{ env.APP_NAME }}
+          export APP_PORT=${{ env.APP_PORT }}
+          export NODE_PORT=${{ env.NODE_PORT }}
+          export REPLICA_COUNT=${{ env.REPLICA_COUNT }}
 
-            envsubst < k8s/namespace-template.yaml > k8s/namespace.yaml
-            envsubst < k8s/deployment-template.yaml > k8s/deployment.yaml
-            envsubst < k8s/service-template.yaml > k8s/service.yaml
+          envsubst < k8s/namespace-template.yaml > k8s/namespace.yaml
+          envsubst < k8s/deployment-template.yaml > k8s/deployment.yaml
+          envsubst < k8s/service-template.yaml > k8s/service.yaml
 
-            kubectl apply -f k8s/namespace.yaml --validate=false
-            kubectl apply -f k8s/deployment.yaml --validate=false
-            kubectl apply -f k8s/service.yaml --validate=false
-
-      - run:
-          name: Success Message
-          command: echo "✅ Checkout, Build, Dockerize & Deploy completed successfully!"
-
-workflows:
-  version: 2
-  build_and_deploy_workflow:
-    jobs:
-      - build-and-deploy
+      # ----------------------------------------------------
+      # 8️⃣ Apply Kubernetes Manifests
+      # ----------------------------------------------------
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f k8s/namespace.yaml --validate=false
+          kubectl apply -f k8s/deployment.yaml --validate=false
+          kubectl apply -f k8s/service.yaml --validate=false
