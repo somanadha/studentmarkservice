@@ -54,7 +54,7 @@ public class StudentMarkServiceTests {
 
     @Test
     @Order(3)
-    public void findAllTest() {
+    public void findAllTest_1() {
         List<Student> students = studentMarkService.findAllStudents();
 
         assertEquals(2, students.size());
@@ -64,7 +64,7 @@ public class StudentMarkServiceTests {
 
     @Test
     @Order(4)
-    public void findByIdTest_1() {
+    public void findByIdTest() {
         Student student = studentMarkService.findById(1);
 
         assertNotEquals(null, student);
