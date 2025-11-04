@@ -26,6 +26,7 @@ public class StudentMarkServiceTests {
         Student student = new Student(1, "Satya", 100, 100, 100);
         studentMarkService.addOneStudent(student);
         student = studentMarkServiceRepository.findById(1);
+
         //assertNotEquals(null, student);
         //assertEquals("Satya", student.getName());
     }
