@@ -59,4 +59,3 @@ jobs:
 
       - name: Display Success Message
         run: echo "✅ Maven build and Docker image pushed successfully!"
-
