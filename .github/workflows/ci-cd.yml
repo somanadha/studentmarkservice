@@ -57,3 +57,4 @@ jobs:
           context: .
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/my-java-app:${{ github.run_number }},${{ secrets.DOCKERHUB_USERNAME }}/my-java-app:latest
+
