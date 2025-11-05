@@ -7,7 +7,7 @@ on:
   pull_request:
 
 env:
-  IMAGE_NAME: my-java-app
+  IMAGE_NAME: studentmarkservice
 
 jobs:
   build-test:
@@ -30,7 +30,7 @@ jobs:
       - name: Archive JAR
         uses: actions/upload-artifact@v4
         with:
-          name: myapp-jar
+          name: studentmarkservice
           path: target/*.jar
 
   docker-build-push:
@@ -56,5 +56,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/my-java-app:${{ github.run_number }},${{ secrets.DOCKERHUB_USERNAME }}/my-java-app:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/studentmarkservice:${{ github.run_number }},${{ secrets.DOCKERHUB_USERNAME }}/studentmarkservice:latest
 
