@@ -1,6 +1,5 @@
 version: 2.1
 
-# Reusable environment variables
 defaults: &defaults
   APP_NAME: studentmarkservice
   IMAGE_NAME: studentmarkservice-image
@@ -11,7 +10,7 @@ defaults: &defaults
 jobs:
   build-and-dockerize:
     docker:
-      - image: cimg/openjdk:21.0  # CircleCI Java 21 image
+      - image: cimg/openjdk:21.0  # Java 21 image with Maven support
     environment:
       <<: *defaults
 
@@ -24,26 +23,23 @@ jobs:
             - maven-{{ checksum "pom.xml" }}
             - maven-
 
-      # Build application with Maven
+      # Build the application JAR
       - run:
           name: Build JAR using Maven
           command: |
             mvn dependency:copy-dependencies
             mvn -X package -DskipTests
 
-      # Save Maven cache
       - save_cache:
           paths:
             - ~/.m2
           key: maven-{{ checksum "pom.xml" }}
 
-      # Install Docker CLI inside container
-      - run:
-          name: Install Docker CLI
-          command: |
-            sudo apt-get update && sudo apt-get install -y docker.io
+      # Enable remote Docker environment (runs Docker in isolated VM)
+      - setup_remote_docker:
+          version: 20.10.14
 
-      # Authenticate to Docker Hub
+      # Login to Docker Hub
       - run:
           name: Docker Login
           command: |
@@ -56,7 +52,6 @@ jobs:
             docker build -t $REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG .
             docker push $REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
 
-      # Display success message
       - run:
           name: Display Success Message
           command: echo "✅ Maven build and Docker image pushed successfully!"
