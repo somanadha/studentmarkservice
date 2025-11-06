@@ -1,111 +1,68 @@
-name: CI/CD Pipeline - StudentMarkService
+version: 2.1
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
-env:
+# Reusable environment variables
+defaults: &defaults
   APP_NAME: studentmarkservice
-  APP_NAMESPACE: studentmarkservice-ns
   IMAGE_NAME: studentmarkservice-image
-  APP_PORT: 8100
-  NODE_PORT: 30081
-  REPLICA_COUNT: 2
-  REGISTRY: docker.io/your-dockerhub-username   # 🔹 Update this
-  K8S_CONFIG_PATH: ${{ github.workspace }}/.kube/config
+  APP_PORT: "8100"
+  REGISTRY: docker.io
+  IMAGE_TAG: latest
 
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
+  build-and-dockerize:
+    docker:
+      - image: cimg/openjdk:21.0  # CircleCI Java 21 image
+    environment:
+      <<: *defaults
 
     steps:
-      # ----------------------------------------------------
-      # 1️⃣ Checkout the Source Code
-      # ----------------------------------------------------
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - checkout
 
-      # ----------------------------------------------------
-      # 2️⃣ Set up Java & Maven
-      # ----------------------------------------------------
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '21'
+      # Cache Maven dependencies
+      - restore_cache:
+          keys:
+            - maven-{{ checksum "pom.xml" }}
+            - maven-
 
-      - name: Build with Maven
-        run: mvn clean package -DskipTests
+      # Build application with Maven
+      - run:
+          name: Build JAR using Maven
+          command: |
+            mvn dependency:copy-dependencies
+            mvn -X package -DskipTests
 
-      # ----------------------------------------------------
-      # 3️⃣ Set up Docker
-      # ----------------------------------------------------
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      # Save Maven cache
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: maven-{{ checksum "pom.xml" }}
 
-      - name: Log in to DockerHub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+      # Install Docker CLI inside container
+      - run:
+          name: Install Docker CLI
+          command: |
+            sudo apt-get update && sudo apt-get install -y docker.io
 
-      # ----------------------------------------------------
-      # 4️⃣ Build and Push Docker Image
-      # ----------------------------------------------------
-      - name: Build and Push Docker Image
-        run: |
-          IMAGE_TAG=${{ github.run_number }}${{ github.run_number }}
-          docker build -t $REGISTRY/$IMAGE_NAME:$IMAGE_TAG -f Dockerfile .
-          docker push $REGISTRY/$IMAGE_NAME:$IMAGE_TAG
-        env:
-          REGISTRY: ${{ env.REGISTRY }}
-          IMAGE_NAME: ${{ env.IMAGE_NAME }}
+      # Authenticate to Docker Hub
+      - run:
+          name: Docker Login
+          command: |
+            echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
 
-      # ----------------------------------------------------
-      # 5️⃣ Setup Kubectl
-      # ----------------------------------------------------
-      - name: Set up kubectl
-        uses: azure/setup-kubectl@v4
-        with:
-          version: 'latest'
+      # Build and push Docker image
+      - run:
+          name: Build and Push Docker Image
+          command: |
+            docker build -t $REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG .
+            docker push $REGISTRY/$DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
 
-      # ----------------------------------------------------
-      # 6️⃣ Configure Kubeconfig (from GitHub Secret)
-      # ----------------------------------------------------
-      - name: Set up Kubeconfig
-        run: |
-          mkdir -p ${{ github.workspace }}/.kube
-          echo "${{ secrets.KUBECONFIG_DATA }}" > $K8S_CONFIG_PATH
-        env:
-          K8S_CONFIG_PATH: ${{ env.K8S_CONFIG_PATH }}
+      # Display success message
+      - run:
+          name: Display Success Message
+          command: echo "✅ Maven build and Docker image pushed successfully!"
 
-      # ----------------------------------------------------
-      # 7️⃣ Replace Variables in YAML (envsubst)
-      # ----------------------------------------------------
-      - name: Substitute Variables in Manifests
-        run: |
-          sudo apt-get update && sudo apt-get install -y gettext-base
-          export IMAGE_TAG=${{ github.run_number }}${{ github.run_number }}
-          export IMAGE_NAME=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          export APP_NAMESPACE=${{ env.APP_NAMESPACE }}
-          export APP_NAME=${{ env.APP_NAME }}
-          export APP_PORT=${{ env.APP_PORT }}
-          export NODE_PORT=${{ env.NODE_PORT }}
-          export REPLICA_COUNT=${{ env.REPLICA_COUNT }}
-
-          envsubst < k8s/namespace-template.yaml > k8s/namespace.yaml
-          envsubst < k8s/deployment-template.yaml > k8s/deployment.yaml
-          envsubst < k8s/service-template.yaml > k8s/service.yaml
-
-      # ----------------------------------------------------
-      # 8️⃣ Apply Kubernetes Manifests
-      # ----------------------------------------------------
-      - name: Deploy to Kubernetes
-        run: |
-          kubectl apply -f k8s/namespace.yaml --validate=false
-          kubectl apply -f k8s/deployment.yaml --validate=false
-          kubectl apply -f k8s/service.yaml --validate=false
+workflows:
+  version: 2
+  build_and_push:
+    jobs:
+      - build-and-dockerize
