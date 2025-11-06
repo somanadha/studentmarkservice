@@ -66,3 +66,4 @@ workflows:
   build_and_push:
     jobs:
       - build-and-dockerize
+
