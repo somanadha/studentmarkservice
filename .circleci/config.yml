@@ -10,43 +10,37 @@ defaults: &defaults
 jobs:
   build-and-dockerize:
     docker:
-      - image: cimg/openjdk:21.0  # Java 21 environment
+      - image: cimg/openjdk:21.0
     environment:
       <<: *defaults
 
     steps:
       - checkout
 
-      # Restore Maven dependency cache
       - restore_cache:
           keys:
             - maven-{{ checksum "pom.xml" }}
             - maven-
 
-      # Build JAR file
       - run:
           name: Build JAR using Maven
           command: |
             mvn dependency:copy-dependencies
             mvn -X package -DskipTests
 
-      # Save Maven cache for future builds
       - save_cache:
           paths:
             - ~/.m2
           key: maven-{{ checksum "pom.xml" }}
 
-      # Create Docker environment (runs in a dedicated VM)
       - setup_remote_docker:
           version: 20.10.14
 
-      # Login to Docker Hub
       - run:
           name: Docker Login
           command: |
             echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
 
-      # Build & Push Docker image
       - run:
           name: Build and Push Docker Image
           command: |
