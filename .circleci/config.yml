@@ -1,26 +1,25 @@
 version: 2.1
-
-# Environment variables matching the GitHub Actions setup
-# Note: DOCKERHUB_USERNAME and DOCKERHUB_TOKEN should be set as
-# environment variables in your CircleCI project settings.
-parameters:
-  app_name:
-    type: string
-    default: "studentmarkservice"
-  image_name:
-    type: string
-    default: "studentmarkservice-image"
-  app_port:
-    type: integer
-    default: 8100
-  registry:
-    type: string
-    default: "docker.io"
-  image_tag:
-    type: string
-    default: "latest"
-
 jobs:
+  # Environment variables matching the GitHub Actions setup
+  # Note: DOCKERHUB_USERNAME and DOCKERHUB_TOKEN should be set as
+  # environment variables in your CircleCI project settings.
+  parameters:
+    app_name:
+      type: string
+      default: "studentmarkservice"
+    image_name:
+      type: string
+      default: "studentmarkservice-image"
+    app_port:
+      type: integer
+      default: 8100
+    registry:
+      type: string
+      default: "docker.io"
+    image_tag:
+      type: string
+      default: "latest"
+
   build-and-dockerize:
     # Use an executor that has JDK 21, Maven, and basic tools.
     # The cimg/maven image is based on cimg/openjdk and is suitable for this task.
