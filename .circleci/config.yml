@@ -1,63 +1,74 @@
 version: 2.1
 
 jobs:
-  build-and-deploy:
+  build-and-dockerize:
+    parameters:
+      app_name:
+        type: string
+        default: "studentmarkservice"
+      image_name:
+        type: string
+        default: "studentmarkservice-image"
+      app_port:
+        type: integer
+        default: 8100
+      registry:
+        type: string
+        default: "docker.io"
+      image_tag:
+        type: string
+        default: "latest"
+
     docker:
-      - image: cimg/base:stable
+      - image: cimg/openjdk:11.0.29
+
     environment:
-      APP_NAME: "studentmarkservice"
-      APP_NAMESPACE: "studentmarkservice-ns"
-      IMAGE_NAME: "studentmarkservice-image"
-      APP_PORT: "8100"
-      NODE_PORT: "30081"
-      REPLICA_COUNT: "2"
+      APP_NAME: << parameters.app_name >>
+      IMAGE_NAME: << parameters.image_name >>
+      APP_PORT: << parameters.app_port >>
+      REGISTRY: << parameters.registry >>
+      IMAGE_TAG: << parameters.image_tag >>
+      FULL_IMAGE_TAG: ${REGISTRY}/${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG}
+
     steps:
       - checkout
-
+      - restore_cache:
+          keys:
+            - maven-repo-{{ checksum "pom.xml" }}
+            - maven-repo-
       - run:
-          name: Set IMAGE_TAG
+          name: Build JAR using Maven (Skip Tests)
           command: |
-            echo "export IMAGE_TAG=${CIRCLE_BUILD_NUM}${CIRCLE_BUILD_NUM}" >> $BASH_ENV
-            source $BASH_ENV
-            echo "Using image tag: ${IMAGE_TAG}"
-
+            mvn dependency:resolve
+            mvn package -DskipTests
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: maven-repo-{{ checksum "pom.xml" }}
       - setup_remote_docker:
           docker_layer_caching: true
-
       - run:
-          name: Build Docker image
+          name: Log in to Container Registry (Docker Hub)
           command: |
-            docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -f Dockerfile .
-
+            echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin $REGISTRY
       - run:
-          name: Save Docker image as artifact (optional)
+          name: Build and Push Docker Image
           command: |
-            mkdir -p workspace
-            docker save -o workspace/${IMAGE_NAME}_${IMAGE_TAG}.tar ${IMAGE_NAME}:${IMAGE_TAG}
-
+            docker build -t ${FULL_IMAGE_TAG} .
+            docker push ${FULL_IMAGE_TAG}
       - run:
-          name: Deploy to Kubernetes
+          name: Display Success Message
           command: |
-            sudo apt-get update && sudo apt-get install -y gettext-base kubectl
-
-            echo "Kubernetes deployment starting..."
-
-            export KUBECONFIG=$HOME/.kube/config
-
-            envsubst < k8s/namespace-template.yaml > k8s/namespace.yaml
-            envsubst < k8s/deployment-template.yaml > k8s/deployment.yaml
-            envsubst < k8s/service-template.yaml > k8s/service.yaml
-
-            kubectl apply -f k8s/namespace.yaml --validate=false
-            kubectl apply -f k8s/deployment.yaml --validate=false
-            kubectl apply -f k8s/service.yaml --validate=false
-
-      - run:
-          name: Success Message
-          command: echo "✅ Checkout, Build, Dockerize & Deploy completed successfully!"
+          echo "Maven build and Docker image pushed successfully! Tag: ${FULL_IMAGE_TAG}"
 
 workflows:
   version: 2
-  build_and_deploy_workflow:
+  build_test_and_deploy:
     jobs:
-      - build-and-deploy
+      - build-and-dockerize:
+          filters:
+            branches:
+              only:
+                - main
+            tags:
+              ignore: /.*/
