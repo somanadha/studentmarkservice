@@ -21,7 +21,6 @@ jobs:
 
     docker:
       - image: cimg/maven:21.0
-
     environment:
       APP_NAME: << parameters.app_name >>
       IMAGE_NAME: << parameters.image_name >>
@@ -58,7 +57,8 @@ jobs:
             docker push ${FULL_IMAGE_TAG}
       - run:
           name: Display Success Message
-          command: echo "Maven build and Docker image pushed successfully! Tag: ${FULL_IMAGE_TAG}"
+          command: |
+          echo "Maven build and Docker image pushed successfully! Tag: ${FULL_IMAGE_TAG}"
 
 workflows:
   version: 2
