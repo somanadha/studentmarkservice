@@ -1,28 +1,24 @@
 version: 2.1
-jobs:
-  # Environment variables matching the GitHub Actions setup
-  # Note: DOCKERHUB_USERNAME and DOCKERHUB_TOKEN should be set as
-  # environment variables in your CircleCI project settings.
-  parameters:
-    app_name:
-      type: string
-      default: "studentmarkservice"
-    image_name:
-      type: string
-      default: "studentmarkservice-image"
-    app_port:
-      type: integer
-      default: 8100
-    registry:
-      type: string
-      default: "docker.io"
-    image_tag:
-      type: string
-      default: "latest"
 
+jobs:
   build-and-dockerize:
-    # Use an executor that has JDK 21, Maven, and basic tools.
-    # The cimg/maven image is based on cimg/openjdk and is suitable for this task.
+    parameters:
+      app_name:
+        type: string
+        default: "studentmarkservice"
+      image_name:
+        type: string
+        default: "studentmarkservice-image"
+      app_port:
+        type: integer
+        default: 8100
+      registry:
+        type: string
+        default: "docker.io"
+      image_tag:
+        type: string
+        default: "latest"
+
     docker:
       - image: cimg/maven:21.0
 
@@ -32,69 +28,43 @@ jobs:
       APP_PORT: << parameters.app_port >>
       REGISTRY: << parameters.registry >>
       IMAGE_TAG: << parameters.image_tag >>
-      # The full image path is constructed here for reuse
       FULL_IMAGE_TAG: ${REGISTRY}/${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG}
 
     steps:
-      # 1. Checkout Repository
       - checkout
-
-      # 2. Set up Maven Cache (Restore)
       - restore_cache:
           keys:
-            # key based on the project's pom.xml hash
             - maven-repo-{{ checksum "pom.xml" }}
-            # fallback key for partial matches
             - maven-repo-
-
-      # 3. Build JAR using Maven
       - run:
           name: Build JAR using Maven (Skip Tests)
           command: |
-            # Equivalent of mvn dependency:copy-dependencies
             mvn dependency:resolve
-            # Equivalent of mvn -X package -DskipTests
             mvn package -DskipTests
-
-      # 4. Set up Maven Cache (Save)
       - save_cache:
           paths:
             - ~/.m2
           key: maven-repo-{{ checksum "pom.xml" }}
-
-      # 5. Set up Docker and Log in
-      # This step starts a separate, necessary layer for running Docker commands (Buildx equivalent is automatic).
       - setup_remote_docker:
           docker_layer_caching: true
-
       - run:
           name: Log in to Container Registry (Docker Hub)
           command: |
-            # Use environment variables DOCKERHUB_USERNAME and DOCKERHUB_TOKEN which MUST be set
-            # as secrets in the CircleCI project UI for this to work.
             echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin $REGISTRY
-
-      # 6. Build and Push Docker Image
       - run:
           name: Build and Push Docker Image
           command: |
-            # Build the image using the full path. The Dockerfile is expected in the root context.
             docker build -t ${FULL_IMAGE_TAG} .
-            # Push the built image
             docker push ${FULL_IMAGE_TAG}
-
-      # 7. Display Success Message
       - run:
           name: Display Success Message
-          command: |
-            "echo Maven build and Docker image pushed successfully! Tag: ${FULL_IMAGE_TAG}
+          command: echo "Maven build and Docker image pushed successfully! Tag: ${FULL_IMAGE_TAG}"
 
 workflows:
   version: 2
   build_test_and_deploy:
     jobs:
       - build-and-dockerize:
-          # Match the GitHub Actions behavior: run on push and pull_request to 'main'
           filters:
             branches:
               only:
