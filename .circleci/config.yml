@@ -20,7 +20,7 @@ jobs:
         default: "latest"
 
     docker:
-      - image: cimg/maven:21.0
+      - image: cimg/openjdk:latest
     environment:
       APP_NAME: << parameters.app_name >>
       IMAGE_NAME: << parameters.image_name >>
