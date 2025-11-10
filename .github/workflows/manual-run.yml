@@ -1,0 +1,27 @@
+name: Manual CI/CD Pipeline for Student Mark Service
+
+on:
+  # This section allows for manual starting from the GitHub Actions UI
+  workflow_dispatch:
+    # Optional: You can define inputs that the user must provide when starting the workflow
+    inputs:
+      logLevel:
+        description: 'Logging level'
+        required: true
+        default: 'warning'
+      environment:
+        description: 'Environment to run tests against'
+        required: true
+        default: 'staging'
+
+jobs:
+  run_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Display inputs
+        run: |
+          echo "Log Level: ${{ github.event.inputs.logLevel }}"
+          echo "Environment: ${{ github.event.inputs.environment }}"
