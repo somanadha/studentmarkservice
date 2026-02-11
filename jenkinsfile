@@ -21,7 +21,7 @@ pipeline {
                 bat "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -f Dockerfile ."
             }
         }
-        /*
+
         stage('Run Container') {
             steps {
                 script {
@@ -30,8 +30,8 @@ pipeline {
                 }
             }
         }
-        */
-        stage('K8s Container Deployment') {
+
+        /*stage('K8s Container Deployment') {
             steps {
                 script {
                     withEnv(["KUBECONFIG=c:\\users\\test\\.kube\\config"]) {
@@ -47,7 +47,7 @@ pipeline {
                     }
                 }
             }
-        }
+        }*/
     }
     post {
         success {
