@@ -4,7 +4,7 @@ pipeline {
         APP_NAME = "studentmarkservice"
         APP_NAMESPACE = "${APP_NAME}-ns"
         IMAGE_NAME = "${APP_NAME}-image"
-        IMAGE_TAG = "${BUILD_NUMBER}${BUILD_NUMBER}"
+        IMAGE_TAG = "${BUILD_NUMBER}"
         APP_PORT = 8100
         NODE_PORT = 30081
         REPLICA_COUNT = 2
@@ -18,7 +18,7 @@ pipeline {
         stage('Build') {
             steps {
                 // Build docker image using Dockerfile
-                bat "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -f Dockerfile ."
+                bat "docker build T-t ${IMAGE_NAME}:${IMAGE_TAG} -f Dockerfile ."
             }
         }
 
