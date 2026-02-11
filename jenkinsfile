@@ -18,7 +18,7 @@ pipeline {
         stage('Build') {
             steps {
                 // Build docker image using Dockerfile
-                bat "docker build T-t ${IMAGE_NAME}:${IMAGE_TAG} -f Dockerfile ."
+                bat "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -f Dockerfile ."
             }
         }
 
