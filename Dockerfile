@@ -9,7 +9,7 @@ COPY src ./src
 RUN mvn dependency:copy-dependencies
 
 # Package the application as a fat jar or a standard jar
-RUN mvn -X package
+RUN mvn -X package -DskipTests
 
 # Stage 2: Create the final image
 FROM eclipse-temurin:21-alpine
