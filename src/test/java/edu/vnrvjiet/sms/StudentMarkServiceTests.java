@@ -1,10 +1,8 @@
 package edu.vnrvjiet.sms;
 
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.platform.suite.api.Suite;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -15,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Suite
 public class StudentMarkServiceTests {
 
     @Autowired
@@ -24,6 +23,24 @@ public class StudentMarkServiceTests {
     void contextLoads() {
     }
 
+    @BeforeAll
+    public static void setup() {
+        System.out.println("One time setup");
+    }
+
+    @AfterAll
+    public static void teardown() {
+        System.out.println("One time teardown");
+    }
+
+    @BeforeEach
+    public void beforeEachMethod(){
+        System.out.println("\"beforeEachMethod\" is called");
+    }
+    @AfterEach
+    public void afterEachMethod(){
+        System.out.println("\"afterEachMethod\" is called");
+    }
     @Test
     @Order(1)
     public void addOneStudentTest_1() {

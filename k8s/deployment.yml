@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: studentmarkservice-deployment
+  namespace: studentmarkservice-ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: studentmarkservice
+  template:
+    metadata:
+      labels:
+        app: studentmarkservice
+    spec:
+      containers:
+        - name: studentmarkservice-container
+          image: ssatyab/studentmarkservice-image:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8100
