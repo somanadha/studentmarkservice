@@ -36,7 +36,6 @@ pipeline {
                 script {
                     withEnv(["KUBECONFIG=c:\\users\\test\\.kube\\config"]) {
                         // Replace variables in YAML and create concrete files:
-
                         /*
                         bat "envsubst < k8s/namespace-template.yaml > k8s/namespace.yaml"
                         bat "envsubst < k8s/deployment-template.yaml > k8s/deployment.yaml"
