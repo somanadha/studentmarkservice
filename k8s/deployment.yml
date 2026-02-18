@@ -16,6 +16,6 @@ spec:
       containers:
         - name: studentmarkservice-container
           image: ssatyab/studentmarkservice-image:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 8100
