@@ -15,12 +15,12 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/somanadha/studentmarkservice.git'
             }
         }
-        /*stage('Build') {
+        stage('Build') {
             steps {
                 // Build docker image using Dockerfile
                 bat "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -f Dockerfile ."
             }
-        }*/
+        }
 
          /*stage('Run Container') {
             steps {
@@ -36,11 +36,10 @@ pipeline {
                 script {
                     withEnv(["KUBECONFIG=c:\\users\\test\\.kube\\config"]) {
                         // Replace variables in YAML and create concrete files:
-                        /*
                         bat "envsubst < k8s/namespace-template.yaml > k8s/namespace.yaml"
                         bat "envsubst < k8s/deployment-template.yaml > k8s/deployment.yaml"
                         bat "envsubst < k8s/service-template.yaml > k8s/service.yaml"
-                        */
+
                         // Apply manifests
                         bat "kubectl apply -f k8s/namespace.yaml --validate=false"
                         bat "kubectl apply -f k8s/deployment.yaml --validate=false"
