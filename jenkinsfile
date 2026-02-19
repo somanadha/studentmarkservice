@@ -30,7 +30,6 @@ pipeline {
                 }
             }
         }*/
-
        stage('K8s Container Deployment') {
             steps {
                 script {
