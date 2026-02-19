@@ -4,10 +4,10 @@ pipeline {
         APP_NAME = "studentmarkservice"
         APP_NAMESPACE = "${APP_NAME}-ns"
         IMAGE_NAME = "${APP_NAME}-image"
-        IMAGE_TAG = "${BUILD_NUMBER}"
+        IMAGE_TAG = "latest"
         APP_PORT = 8100
         NODE_PORT = 30081
-        REPLICA_COUNT = 2
+        REPLICA_COUNT = 1
     }
     stages {
         stage('Checkout') {
