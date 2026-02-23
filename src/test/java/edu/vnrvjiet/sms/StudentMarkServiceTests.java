@@ -13,7 +13,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@Suite
 public class StudentMarkServiceTests {
 
     @Autowired
